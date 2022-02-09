@@ -1,0 +1,3 @@
+0 = successful
+1 = password does not match
+2 = user/aadhaar not registered
