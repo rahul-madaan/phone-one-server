@@ -61,3 +61,11 @@ def root(request_body: linked_devices):
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     # print(result)
     return result
+
+@app.get("/fetch-device-details/{IMEI}")
+def fetch_phone_details(IMEI: str):
+    mycursor.execute("SELECT * FROM phone_ownership WHERE IMEI = {}".format(IMEI))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    print(result)
+    return result
