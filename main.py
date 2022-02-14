@@ -26,6 +26,7 @@ class login_user(BaseModel):
     aadhaar_number: str
     password: str
 
+
 class linked_devices(BaseModel):
     user_aadhaar_number: str
 
@@ -44,6 +45,7 @@ def root(request_body: login_user):
     else:
         return {'statusCode': 2, 'message': 'Aadhaar not registered'}
 
+
 @app.post("/get-linked-devices")
 def root(request_body: linked_devices):
     mycursor.execute("SELECT * FROM phone_ownership WHERE owner_aadhaar = {}".format(request_body.user_aadhaar_number))
@@ -52,6 +54,10 @@ def root(request_body: linked_devices):
     return result
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.post("/get-user-name")
+def root(request_body: linked_devices):
+    mycursor.execute("SELECT * FROM user_details WHERE aadhaar_number = {}".format(request_body.user_aadhaar_number))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    # print(result)
+    return result
