@@ -19,20 +19,28 @@ mycursor = mydb.cursor()
 app = FastAPI()
 
 # for CORS
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
+                   allow_headers=["*"])
+
+
 # for CORS
 
-class login_user(BaseModel):
+class LoginUser(BaseModel):
     aadhaar_number: str
     password: str
 
 
-class linked_devices(BaseModel):
+class UserAadhaar(BaseModel):
     user_aadhaar_number: str
 
 
+class EmailIMEI(BaseModel):
+    seller_aadhaar: str
+    IMEI: str
+
+
 @app.post("/login")
-def root(request_body: login_user):
+def root(request_body: LoginUser):
     mycursor.execute("SELECT * FROM user_login")
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
@@ -47,7 +55,7 @@ def root(request_body: login_user):
 
 
 @app.post("/get-linked-devices")
-def root(request_body: linked_devices):
+def root(request_body: UserAadhaar):
     mycursor.execute("SELECT * FROM phone_ownership WHERE owner_aadhaar = {}".format(request_body.user_aadhaar_number))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
@@ -55,16 +63,28 @@ def root(request_body: linked_devices):
 
 
 @app.post("/get-user-name")
-def root(request_body: linked_devices):
+def root(request_body: UserAadhaar):
     mycursor.execute("SELECT * FROM user_details WHERE aadhaar_number = {}".format(request_body.user_aadhaar_number))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     # print(result)
     return result
 
+
 @app.get("/fetch-device-details/{IMEI}")
 def fetch_phone_details(IMEI: str):
     mycursor.execute("SELECT * FROM phone_ownership WHERE IMEI = {}".format(IMEI))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    return result
+
+
+@app.post("/verify-owner")
+def root(request_body: EmailIMEI):
+    mycursor.execute("SELECT * FROM phone_ownership WHERE IMEI = {}".format(request_body.IMEI))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    if result[0]['owner_aadhaar'] == request_body.seller_aadhaar:
+        result[0]['status_code'] = 0
+        result[0]['details'] = "Owner verified successfully"
     return result
