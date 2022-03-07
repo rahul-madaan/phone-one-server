@@ -96,3 +96,13 @@ def root(request_body: EmailIMEI):
         result[0]['status_code'] = 0
         result[0]['details'] = "Owner verified successfully"
     return result
+
+
+@app.get("/get-all-states")
+def root():
+    mycursor.execute("SELECT DISTINCT state FROM indian_cities")
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "All states fetched successfully"
+    return result
