@@ -39,6 +39,15 @@ class EmailIMEI(BaseModel):
     IMEI: str
 
 
+class BookPickupSchema(BaseModel):
+    IMEI: str
+    address: str
+    state: str
+    city: str
+    pincode: int
+    landmark: str
+
+
 @app.post("/login")
 def root(request_body: LoginUser):
     mycursor.execute("SELECT * FROM user_login")
@@ -105,4 +114,15 @@ def root():
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     result[0]['status_code'] = 0
     result[0]['details'] = "All states fetched successfully"
+    return result
+
+
+@app.post("/book-pickup-entry")
+def root(request_body: BookPickupSchema):
+    mycursor.execute(
+        "INSERT INTO pickup_requests (IMEI, address, state, city, pincode, landmark) VALUES ({},{},{},{},{},{})".format("\""+request_body.IMEI+"\"","\""+request_body.address+"\"","\""+request_body.state+"\"","\""+request_body.city+"\"",request_body.pincode,"\""+request_body.landmark+"\""))
+    mydb.commit()
+    result = [{}]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully placed pickup request"
     return result
