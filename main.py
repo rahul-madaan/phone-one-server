@@ -138,8 +138,8 @@ def root(IMEI: str):
     # result[0]['status_code'] = 0
     # result[0]['details'] = "Successfully placed pickup request"
     if len(result) == 1:
-        return {"status_code": "0",
+        return {"status_code": 0,
                 "message": "Found IMEI={} in pickup request database".format(IMEI)}
     elif len(result) == 0:
-        return {"status code": "1",
+        return {"status_code": 1,
                 "message": "Not found IMEI={} in pickup request database".format(IMEI)}
