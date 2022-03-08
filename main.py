@@ -134,10 +134,9 @@ def root(IMEI: str):
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     # result[0]['status_code'] = 0
     # result[0]['details'] = "Successfully placed pickup request"
-    if len(result[0]) == 1:
+    if len(result) == 1:
         return {"status code": "0",
                 "message": "Found IMEI={} in pickup request database".format(IMEI)}
-    if len(result[0]) == 0:
+    elif len(result) == 0:
         return {"status code": "1",
                 "message": "Not found IMEI={} in pickup request database".format(IMEI)}
-    return result
