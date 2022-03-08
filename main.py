@@ -126,3 +126,12 @@ def root(request_body: BookPickupSchema):
     result[0]['status_code'] = 0
     result[0]['details'] = "Successfully placed pickup request"
     return result
+
+@app.get("/book-pickup-status/{IMEI}")
+def root(IMEI: str):
+    mycursor.execute("SELECT * FROM pickup_requests where IMEI={}".format("\""+IMEI+"\""))
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully placed pickup request"
+    return result
