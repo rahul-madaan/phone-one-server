@@ -120,16 +120,19 @@ def root():
 @app.post("/book-pickup-entry")
 def root(request_body: BookPickupSchema):
     mycursor.execute(
-        "INSERT INTO pickup_requests (IMEI, address, state, city, pincode, landmark) VALUES ({},{},{},{},{},{})".format("\""+request_body.IMEI+"\"","\""+request_body.address+"\"","\""+request_body.state+"\"","\""+request_body.city+"\"",request_body.pincode,"\""+request_body.landmark+"\""))
+        "INSERT INTO pickup_requests (IMEI, address, state, city, pincode, landmark) VALUES ({},{},{},{},{},{})".format(
+            "\"" + request_body.IMEI + "\"", "\"" + request_body.address + "\"", "\"" + request_body.state + "\"",
+            "\"" + request_body.city + "\"", request_body.pincode, "\"" + request_body.landmark + "\""))
     mydb.commit()
     result = [{}]
     result[0]['status_code'] = 0
     result[0]['details'] = "Successfully placed pickup request"
     return result
 
+
 @app.get("/book-pickup-status/{IMEI}")
 def root(IMEI: str):
-    mycursor.execute("SELECT * FROM pickup_requests where IMEI={}".format("\""+IMEI+"\""))
+    mycursor.execute("SELECT * FROM pickup_requests where IMEI={}".format("\"" + IMEI + "\""))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     # result[0]['status_code'] = 0
