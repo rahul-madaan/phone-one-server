@@ -10,7 +10,7 @@ from pydantic import BaseModel
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="password",
     database="phone"
 )
 
@@ -135,11 +135,19 @@ def root(IMEI: str):
     mycursor.execute("SELECT * FROM pickup_requests where IMEI={}".format("\"" + IMEI + "\""))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
-    # result[0]['status_code'] = 0
-    # result[0]['details'] = "Successfully placed pickup request"
     if len(result) == 1:
         return {"status_code": 0,
                 "message": "Found IMEI={} in pickup request database".format(IMEI)}
     elif len(result) == 0:
         return {"status_code": 1,
                 "message": "Not found IMEI={} in pickup request database".format(IMEI)}
+
+
+
+@app.post("/fetch-transfer-requests")
+def root(request_body: UserAadhaar):
+    mycursor.execute("SELECT * FROM transfer_requests WHERE transfer_from_aadhaar = {}".format(request_body.user_aadhaar_number))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    print(result)
+    return result
