@@ -11,3 +11,7 @@ VERIFY OWNER
 CHECK BOOK PICKUP STATUS
 0 = found in db
 1 = not found in db
+
+CHECK OWNER
+0 = found in DB
+1 = not found in DB
