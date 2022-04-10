@@ -149,5 +149,5 @@ def root(request_body: UserAadhaar):
     mycursor.execute("SELECT * FROM transfer_requests WHERE transfer_from_aadhaar = {}".format(request_body.user_aadhaar_number))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
-    print(result)
+    # print(result)
     return result
