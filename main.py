@@ -74,7 +74,6 @@ def root(request_body: UserAadhaar):
     lost_list=[]
     for device in lost_result:
         lost_list.append(device['IMEI'])
-    print(lost_list)
     res = [i for i in result if not (i['IMEI'] in lost_list)]
     return res
 
