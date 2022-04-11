@@ -68,7 +68,15 @@ def root(request_body: UserAadhaar):
     mycursor.execute("SELECT * FROM phone_ownership WHERE owner_aadhaar = {}".format(request_body.user_aadhaar_number))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
-    return result
+    mycursor.execute("SELECT * FROM lost_record")
+    columns = mycursor.description
+    lost_result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    lost_list=[]
+    for device in lost_result:
+        lost_list.append(device['IMEI'])
+    print(lost_list)
+    res = [i for i in result if not (i['IMEI'] in lost_list)]
+    return res
 
 
 @app.post("/get-user-name")
