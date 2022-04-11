@@ -166,3 +166,16 @@ def root(IMEI: str):
         result[0]['status_code'] = 0
         result[0]['message'] = 'Device found in Database'
     return result
+
+
+@app.post("/report-theft")
+def root(IMEI: str):
+    mycursor.execute(
+        "INSERT INTO lost_record (IMEI) VALUES ({})".format(
+            "\"" + IMEI + "\""))
+    mydb.commit()
+    result = [{}]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully reported device as lost"
+    return result
+
