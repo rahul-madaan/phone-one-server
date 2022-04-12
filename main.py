@@ -164,7 +164,6 @@ def root(IMEI: str):
     mycursor.execute("SELECT * FROM phone_ownership WHERE IMEI = {}".format(IMEI))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
-    print(result)
     if len(result) == 0:
         result = [{}]
         result[0]['status_code'] = 1
