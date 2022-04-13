@@ -185,3 +185,15 @@ def root(IMEI: str):
     result[0]['details'] = "Successfully reported device as lost"
     return result
 
+@app.get("/check-lost-status/{IMEI}")
+def root(IMEI: str):
+    mycursor.execute("SELECT * FROM lost_record where IMEI={}".format("\"" + IMEI + "\""))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    if len(result) == 1:
+        return [{"status_code": 0,
+                "message": "Found IMEI={} in lost_record database".format(IMEI)}]
+    elif len(result) == 0:
+        return [{"status_code": 1,
+                "message": "Not found IMEI={} in lost_record database".format(IMEI)}]
+

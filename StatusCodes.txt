@@ -15,3 +15,7 @@ CHECK BOOK PICKUP STATUS
 CHECK OWNER
 0 = found in DB
 1 = not found in DB
+
+CHECK LOST STATUS
+0 = phone lost/stolen
+1 = phone not lost/stolen
