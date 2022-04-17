@@ -47,6 +47,10 @@ class BookPickupSchema(BaseModel):
     pincode: int
     landmark: str
 
+class updateDeviceOwnershipSchema(BaseModel):
+    IMEI: str
+    buyer_aadhaar: str
+
 
 @app.post("/login")
 def root(request_body: LoginUser):
@@ -197,3 +201,16 @@ def root(IMEI: str):
         return [{"status_code": 1,
                 "message": "Not found IMEI={} in lost_record database".format(IMEI)}]
 
+
+@app.post("/update-device-ownership")
+def root(request_body: updateDeviceOwnershipSchema):
+    mycursor.execute(
+        "UPDATE phone_ownership SET owner_aadhaar = {}  WHERE IMEI = {}".format("\"" +request_body.buyer_aadhaar + "\"", "\"" + request_body.IMEI + "\""))
+    mydb.commit()
+    mycursor.execute(
+        "SELECT * FROM phone_ownership WHERE IMEI = {}".format("\"" + request_body.IMEI + "\""))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully updated owner"
+    return result
