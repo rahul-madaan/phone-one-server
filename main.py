@@ -214,3 +214,13 @@ def root(request_body: updateDeviceOwnershipSchema):
     result[0]['status_code'] = 0
     result[0]['details'] = "Successfully updated owner"
     return result
+
+@app.post("/detete-transfer-request")
+def root(IMEI: str):
+    mycursor.execute(
+        "DELETE FROM transfer_requests WHERE IMEI = {}".format("\"" + IMEI + "\""))
+    mydb.commit()
+    result = [{}]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully removed the transfer request from database"
+    return result
