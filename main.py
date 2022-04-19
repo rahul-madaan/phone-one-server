@@ -265,6 +265,18 @@ def root(user_aadhaar: str):
         return [{"status_code": 1,
                  "message": "Not found Aadhaar = {} in user_details database".format(user_aadhaar)}]
 
+@app.get("/check-IMEI-validity/{IMEI}")
+def root(IMEI: str):
+    mycursor.execute("SELECT * FROM phone_ownership where IMEI ={}".format("\"" + IMEI + "\""))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    if len(result) == 1:
+        return [{"status_code": 0,
+                 "message": "IMEI = {} in phone_ownership database".format(IMEI)}]
+    elif len(result) == 0:
+        return [{"status_code": 1,
+                 "message": "Not found IMEI = {} in phone_ownership database".format(IMEI)}]
+
 
 @app.post("/create-transfer-request")
 def root(request_body: createTransferRequestSchema):
