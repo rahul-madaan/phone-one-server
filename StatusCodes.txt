@@ -19,3 +19,7 @@ CHECK OWNER
 CHECK LOST STATUS
 0 = phone lost/stolen
 1 = phone not lost/stolen
+
+GET TRANSFER REQUESTS BY IMEI
+0= Device already requested by someone
+1= Device not requested by anyone

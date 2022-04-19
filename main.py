@@ -107,10 +107,10 @@ def root(request_body: EmailIMEI):
     if not result:
         result = [{"status_code": 1,
                    "details": "No such Device exists",
-                   "owner_aadhaar": "DUMMY",
-                   "IMEI": "DUMMY",
-                   "manufacturer": "DUMMY",
-                   "model_name": "DUMMY"}]
+                   "owner_aadhaar": "NONE",
+                   "IMEI": "NONE",
+                   "manufacturer": "NONE",
+                   "model_name": "NONE"}]
         return result
     if result[0]['owner_aadhaar'] == request_body.seller_aadhaar:
         result[0]['status_code'] = 0
@@ -224,3 +224,17 @@ def root(IMEI: str):
     result[0]['status_code'] = 0
     result[0]['details'] = "Successfully removed the transfer request from database"
     return result
+
+@app.post("/get-transfer-request-by-IMEI/{IMEI}")
+def root(IMEI: str):
+    mycursor.execute("SELECT * FROM transfer_requests where IMEI={}".format("\"" + IMEI + "\""))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    if len(result) == 1:
+        return [{"status_code": 0,
+                 "message": "Found IMEI={} in transfer_requests database".format(IMEI)}]
+    elif len(result) == 0:
+        return [{"status_code": 1,
+                 "message": "Not found IMEI={} in transfer_requests database".format(IMEI)}]
+
+
