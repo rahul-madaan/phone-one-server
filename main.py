@@ -237,4 +237,16 @@ def root(IMEI: str):
         return [{"status_code": 1,
                  "message": "Not found IMEI={} in transfer_requests database".format(IMEI)}]
 
+@app.get("/check-aadhaar-validity/{user_aadhaar}")
+def root(user_aadhaar: str):
+    mycursor.execute("SELECT * FROM user_details where aadhaar_number ={}".format("\"" + user_aadhaar + "\""))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    if len(result) == 1:
+        return [{"status_code": 0,
+                "message": "Found Aadhaar = {} in user_details database".format(user_aadhaar)}]
+    elif len(result) == 0:
+        return [{"status_code": 1,
+                "message": "Not found Aadhaar = {} in user_details database".format(user_aadhaar)}]
+
 

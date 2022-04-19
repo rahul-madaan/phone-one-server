@@ -1,4 +1,3 @@
-
 LOGIN
 0 = successful
 1 = password does not match
@@ -23,3 +22,7 @@ CHECK LOST STATUS
 GET TRANSFER REQUESTS BY IMEI
 0= Device already requested by someone
 1= Device not requested by anyone
+
+CHECK AADHAAR VALIDITY
+0= Aadhaar exists
+1= Aadhaar does not exist
