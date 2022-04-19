@@ -34,7 +34,7 @@ class UserAadhaar(BaseModel):
     user_aadhaar_number: str
 
 
-class EmailIMEI(BaseModel):
+class AadhaarIMEI(BaseModel):
     seller_aadhaar: str
     IMEI: str
 
@@ -100,7 +100,7 @@ def fetch_phone_details(IMEI: str):
 
 
 @app.post("/verify-owner")
-def root(request_body: EmailIMEI):
+def root(request_body: AadhaarIMEI):
     mycursor.execute("SELECT * FROM phone_ownership WHERE IMEI = {}".format(request_body.IMEI))
     columns = mycursor.description
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
