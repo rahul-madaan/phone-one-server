@@ -111,10 +111,12 @@ def root(request_body: EmailIMEI):
                    "IMEI": "NONE",
                    "manufacturer": "NONE",
                    "model_name": "NONE"}]
-        return result
-    if result[0]['owner_aadhaar'] == request_body.seller_aadhaar:
+    elif result[0]['owner_aadhaar'] == request_body.seller_aadhaar:
         result[0]['status_code'] = 0
         result[0]['details'] = "Owner verified successfully"
+    else:
+        result[0]['status_code'] = 2
+        result[0]['details'] = "Different owner"
     return result
 
 

@@ -6,6 +6,7 @@ LOGIN
 VERIFY OWNER
 0 = successful
 1 = phone does not exist
+2 = Different owner
 
 CHECK BOOK PICKUP STATUS
 0 = found in db
