@@ -47,9 +47,18 @@ class BookPickupSchema(BaseModel):
     pincode: int
     landmark: str
 
+
 class updateDeviceOwnershipSchema(BaseModel):
     IMEI: str
     buyer_aadhaar: str
+
+
+class createTransferRequestSchema(BaseModel):
+    buyer_aadhaar: str
+    seller_aadhaar: str
+    IMEI: str
+    buyer_name: str
+    device_name: str
 
 
 @app.post("/login")
@@ -75,7 +84,7 @@ def root(request_body: UserAadhaar):
     mycursor.execute("SELECT * FROM lost_record")
     columns = mycursor.description
     lost_result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
-    lost_list=[]
+    lost_list = []
     for device in lost_result:
         lost_list.append(device['IMEI'])
     res = [i for i in result if not (i['IMEI'] in lost_list)]
@@ -191,6 +200,7 @@ def root(IMEI: str):
     result[0]['details'] = "Successfully reported device as lost"
     return result
 
+
 @app.get("/check-lost-status/{IMEI}")
 def root(IMEI: str):
     mycursor.execute("SELECT * FROM lost_record where IMEI={}".format("\"" + IMEI + "\""))
@@ -198,16 +208,17 @@ def root(IMEI: str):
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     if len(result) == 1:
         return [{"status_code": 0,
-                "message": "Found IMEI={} in lost_record database".format(IMEI)}]
+                 "message": "Found IMEI={} in lost_record database".format(IMEI)}]
     elif len(result) == 0:
         return [{"status_code": 1,
-                "message": "Not found IMEI={} in lost_record database".format(IMEI)}]
+                 "message": "Not found IMEI={} in lost_record database".format(IMEI)}]
 
 
 @app.post("/update-device-ownership")
 def root(request_body: updateDeviceOwnershipSchema):
     mycursor.execute(
-        "UPDATE phone_ownership SET owner_aadhaar = {}  WHERE IMEI = {}".format("\"" +request_body.buyer_aadhaar + "\"", "\"" + request_body.IMEI + "\""))
+        "UPDATE phone_ownership SET owner_aadhaar = {}  WHERE IMEI = {}".format(
+            "\"" + request_body.buyer_aadhaar + "\"", "\"" + request_body.IMEI + "\""))
     mydb.commit()
     mycursor.execute(
         "SELECT * FROM phone_ownership WHERE IMEI = {}".format("\"" + request_body.IMEI + "\""))
@@ -216,6 +227,7 @@ def root(request_body: updateDeviceOwnershipSchema):
     result[0]['status_code'] = 0
     result[0]['details'] = "Successfully updated owner"
     return result
+
 
 @app.post("/detete-transfer-request")
 def root(IMEI: str):
@@ -226,6 +238,7 @@ def root(IMEI: str):
     result[0]['status_code'] = 0
     result[0]['details'] = "Successfully removed the transfer request from database"
     return result
+
 
 @app.post("/get-transfer-request-by-IMEI/{IMEI}")
 def root(IMEI: str):
@@ -239,6 +252,7 @@ def root(IMEI: str):
         return [{"status_code": 1,
                  "message": "Not found IMEI={} in transfer_requests database".format(IMEI)}]
 
+
 @app.get("/check-aadhaar-validity/{user_aadhaar}")
 def root(user_aadhaar: str):
     mycursor.execute("SELECT * FROM user_details where aadhaar_number ={}".format("\"" + user_aadhaar + "\""))
@@ -246,9 +260,24 @@ def root(user_aadhaar: str):
     result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
     if len(result) == 1:
         return [{"status_code": 0,
-                "message": "Found Aadhaar = {} in user_details database".format(user_aadhaar)}]
+                 "message": "Found Aadhaar = {} in user_details database".format(user_aadhaar)}]
     elif len(result) == 0:
         return [{"status_code": 1,
-                "message": "Not found Aadhaar = {} in user_details database".format(user_aadhaar)}]
+                 "message": "Not found Aadhaar = {} in user_details database".format(user_aadhaar)}]
 
 
+@app.post("/create-transfer-request")
+def root(request_body: createTransferRequestSchema):
+    mycursor.execute(
+        "INSERT INTO transfer_requests (transfer_to_aadhaar, transfer_from_aadhaar, IMEI, buyer_name, device_name) VALUES ({}, {}, {}, {}, {})".format(
+            "\"" + request_body.buyer_aadhaar + "\"", "\"" + request_body.seller_aadhaar + "\"",
+            "\"" + request_body.IMEI + "\"", "\"" + request_body.buyer_name + "\"",
+            "\"" + request_body.device_name + "\""))
+    mydb.commit()
+    mycursor.execute(
+        "SELECT * FROM transfer_requests WHERE IMEI = {}".format("\"" + request_body.IMEI + "\""))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully raised transfer request"
+    return result
