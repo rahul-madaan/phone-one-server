@@ -75,6 +75,20 @@ def root(request_body: LoginUser):
     else:
         return {'statusCode': 2, 'message': 'Aadhaar not registered'}
 
+@app.post("/register-incomplete")
+def root(request_body: LoginUser):
+    mycursor.execute("SELECT * FROM user_login")
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    for credentials in result:
+        if request_body.aadhaar_number == credentials['aadhaar_number']:
+            if request_body.password == credentials['password']:
+                return {'statusCode': 0, 'message': 'Login Successful'}
+            else:
+                return {'statusCode': 1, 'message': 'Password does not match'}
+    else:
+        return {'statusCode': 2, 'message': 'Aadhaar not registered'}
+
 
 @app.post("/get-linked-devices")
 def root(request_body: UserAadhaar):
