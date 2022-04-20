@@ -188,6 +188,15 @@ def root(request_body: UserAadhaar):
     return result
 
 
+@app.post("/fetch-my-transfer-requests")
+def root(request_body: UserAadhaar):
+    mycursor.execute(
+        "SELECT * FROM transfer_requests WHERE transfer_to_aadhaar = {}".format(request_body.user_aadhaar_number))
+    columns = mycursor.description
+    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
+    return result
+
+
 @app.post("/check-owner")
 def root(IMEI: str):
     mycursor.execute("SELECT * FROM phone_ownership WHERE IMEI = {}".format(IMEI))
