@@ -243,7 +243,7 @@ def root(request_body: updateDeviceOwnershipSchema):
     return result
 
 
-@app.post("/detete-transfer-request")
+@app.post("/delete-transfer-request")
 def root(IMEI: str):
     mycursor.execute(
         "DELETE FROM transfer_requests WHERE IMEI = {}".format("\"" + IMEI + "\""))
