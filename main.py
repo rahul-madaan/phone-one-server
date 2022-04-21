@@ -21,8 +21,6 @@ app = FastAPI()
 # for CORS
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
                    allow_headers=["*"])
-
-
 # for CORS
 
 class LoginUser(BaseModel):
@@ -61,6 +59,13 @@ class createTransferRequestSchema(BaseModel):
     device_name: str
 
 
+class RegisterUserSchema(BaseModel):
+    aadhaar_number: str
+    password: str
+    user_name: str
+    email: str
+    phone_number: str
+
 @app.post("/login")
 def root(request_body: LoginUser):
     mycursor.execute("SELECT * FROM user_login")
@@ -75,19 +80,23 @@ def root(request_body: LoginUser):
     else:
         return {'statusCode': 2, 'message': 'Aadhaar not registered'}
 
-@app.post("/register-incomplete")
-def root(request_body: LoginUser):
-    mycursor.execute("SELECT * FROM user_login")
-    columns = mycursor.description
-    result = [{columns[index][0]: column for index, column in enumerate(value)} for value in mycursor.fetchall()]
-    for credentials in result:
-        if request_body.aadhaar_number == credentials['aadhaar_number']:
-            if request_body.password == credentials['password']:
-                return {'statusCode': 0, 'message': 'Login Successful'}
-            else:
-                return {'statusCode': 1, 'message': 'Password does not match'}
-    else:
-        return {'statusCode': 2, 'message': 'Aadhaar not registered'}
+@app.post("/register_user")
+def root(request_body: RegisterUserSchema):
+    mycursor.execute(
+        "INSERT INTO user_details (aadhaar_number, name, email, phone_number) VALUES ({}, {}, {}, {})".format(
+            "\"" + request_body.aadhaar_number + "\"", "\"" + request_body.user_name + "\"",
+            "\"" + request_body.email + "\"", "\"" + request_body.phone_number + "\""))
+    mydb.commit()
+
+    mycursor.execute(
+        "INSERT INTO user_login (aadhaar_number, password) VALUES ({}, {})".format(
+            "\"" + request_body.aadhaar_number + "\"", "\"" + request_body.password + "\""))
+    mydb.commit()
+
+    result = [{}]
+    result[0]['status_code'] = 0
+    result[0]['details'] = "Successfully registered user"
+    return result
 
 
 @app.post("/get-linked-devices")
